@@ -6,6 +6,14 @@
     android:layout_height="match_parent"
     tools:context=".regActivity">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Need a insertion api key to insert data into db, develop an api key takes time"
+        android:textColor="#ff0000"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageView
         android:layout_width="100dp"
         android:layout_height="100dp"

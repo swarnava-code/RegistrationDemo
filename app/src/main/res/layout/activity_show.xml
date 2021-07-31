@@ -7,16 +7,16 @@
     tools:context=".MainActivity">
 
 
-    <ListView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/lv"></ListView>
-    <TextView
+        android:layout_height="match_parent">
+        <TextView
+            android:text="Please Wait..."
+            android:id="@+id/json"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"></TextView>
 
-        android:text="Please Wait..."
-        android:id="@+id/json"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"></TextView>
+    </ScrollView>
 
 
 </LinearLayout>
