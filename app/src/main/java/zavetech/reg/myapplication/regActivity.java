@@ -31,7 +31,6 @@ public class regActivity extends AppCompatActivity {
         setContentView(R.layout.activity_reg);
 
         submitBtn = findViewById(R.id.submitBtn);
-
         nameTv = findViewById(R.id.name);
         mobileTv = findViewById(R.id.mobile);
         emailTv = findViewById(R.id.email);
