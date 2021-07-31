@@ -6,9 +6,17 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
+
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/lv"></ListView>
+    <TextView
+
+        android:text="Please Wait..."
+        android:id="@+id/json"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"></TextView>
+
 
 </LinearLayout>

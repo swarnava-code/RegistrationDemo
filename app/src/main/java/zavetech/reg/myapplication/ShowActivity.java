@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -12,6 +13,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -26,7 +28,7 @@ import org.json.JSONObject;
 public class ShowActivity extends AppCompatActivity {
 
     ListView lv;
-    TextView nameTv, mobileTv, emailTv, addressTv, genderTv, imageTv;
+    TextView nameTv, mobileTv, emailTv, addressTv, genderTv, imageTv, textView;
 
     String[] idArr = new String[100];
     String[] nameArr = new String[100];
@@ -36,6 +38,7 @@ public class ShowActivity extends AppCompatActivity {
     String[] genderArr = new String[100];
     String[] imageArr = new String[100];
 
+    String jsonStr="";
     int length;
 
 
@@ -44,135 +47,83 @@ public class ShowActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show);
 
-        new ShowActivity.asyncTask().execute();
+        textView = findViewById(R.id.json);
+
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                new ShowActivity.GetApiCall().execute();
+            }
+        };
+        Handler h = new Handler();
+        h.postDelayed(r,500);
 
     }
 
-
-
-    private class asyncTask extends AsyncTask<Void, Void, Void> {
+    private class GetApiCall extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            //before execution
-            // we can interact with frontend(GUI) here
+
         }
 
         @Override
         protected Void doInBackground(Void... arg0) {
-            String url="https://api.themoviedb.org/3/movie/top_rated?api_key=8265bd1679663a7ea12ac168da84d2e8&language=en-US&page=1";
+            HttpHandler sh = new HttpHandler();
+            // Making a request to url and getting response
+            jsonStr = sh.makeServiceCall("https://swarnava.delgradecorporation.in/project1/get_users_details.php");
+            try {
 
-            StringRequest stringRequest = new StringRequest
-                    (StringRequest.Method.GET, url,
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
+                JSONArray parentArray = new JSONArray(jsonStr);
 
-                                    try {
+                length = parentArray.length();
 
-                                        JSONObject parentObject = new JSONObject(response);
+                for(int i=0; i<length; i++){
 
+                    JSONObject temp = parentArray.getJSONObject(i);
 
+                    idArr[i] = temp.getString("id");
+                    nameArr[i] = temp.getString("name");
+                    mobileArr[i] = temp.getString("mobile");
+                    emailArr[i] = temp.getString("email");
+                    genderArr[i] = temp.getString("gender");
+                    addressArr[i] = temp.getString("address");
+                    imageArr[i] = temp.getString("photo_upload");
 
-                                        //JSONArray result=parentObject.getJSONArray("results");
-                                        //parentObject.get
-
-                                        length = parentObject.length();
-
-                                        for(int i=0; i<length; i++){
-
-                                            JSONObject temp = parentObject.getJSONObject(""+i);
-
-                                            idArr[i] = temp.getString("id");
-                                            nameArr[i] = temp.getString("name");
-                                            mobileArr[i] = temp.getString("mobile");
-                                            emailArr[i] = temp.getString("email");
-                                            genderArr[i] = temp.getString("gender");
-                                            addressArr[i] = temp.getString("photo_upload");
-                                            imageArr[i] = temp.getString("photo_upload");
-
-                                        }
-
-                                    }catch (JSONException e){
-                                        e.printStackTrace();
-                                    }
-                                }
-                            },
-                            new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-
-                                }
-                            });
-
-            RequestQueue requestQueue= Volley.newRequestQueue(ShowActivity.this);
-            requestQueue.add(stringRequest);
-
-            CustomAdapter cadapter = new CustomAdapter();
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    lv.setAdapter(cadapter);
                 }
-            });
+
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
 
             return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-            //for update
         }
 
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            //execute this after backgroud task completed
-            // we can interact with frontend(GUI) here
-        }
 
-    }
+            jsonStr = "\n\n## Converting json to table...\n\n"+jsonStr+"\n\n## Converting json to table...\n\n";
+            textView.setText(jsonStr);
+
+            Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    String table = "";
+                    for(int i=0; i<length; i++){
+                        table += nameArr[i]+"\n"+mobileArr[i]+"\n"+emailArr[i]+"\n"+genderArr[i]+"\n"+addressArr[i]+"\n"+imageArr[i]+"\n__________________\n";
+                    }
+                    textView.setText(table);
+                }
+            };
+            Handler h = new Handler();
+            h.postDelayed(r,2000);
 
 
-    class CustomAdapter extends BaseAdapter {
-
-        @Override
-        public int getCount() {
-            return length;
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-
-            view = getLayoutInflater().inflate(R.layout.single_element, null);
-
-            nameTv = view.findViewById(R.id.name);
-            mobileTv = view.findViewById(R.id.mobile);
-            emailTv = view.findViewById(R.id.email);
-            addressTv = view.findViewById(R.id.address);
-            genderTv = view.findViewById(R.id.gender);
-            imageTv = view.findViewById(R.id.image);
-
-            nameTv.setText(nameArr[i]);
-            mobileTv.setText(mobileArr[i]);
-            emailTv.setText(emailArr[i]);
-            addressTv.setText(addressArr[i]);
-            genderTv.setText(genderArr[i]);
-            imageTv.setText(imageArr[i]);
-
-            return view;
+            if (textView.getText() == null || textView.getText().equals("")) {
+                Toast.makeText(ShowActivity.this, "Something Wrong", Toast.LENGTH_SHORT).show();
+                //informUser("Something Error");
+            }
 
         }
     }
